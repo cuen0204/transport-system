@@ -4,178 +4,523 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>福祉施設児童送迎システム</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f9fafb;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 16px 0;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .header p {
+            color: #6b7280;
+        }
+        .main {
+            padding: 32px 0;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .section-title h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        .section-title p {
+            color: #6b7280;
+        }
+        .grid {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            margin-bottom: 32px;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .card-date {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .card-stats {
+            margin-bottom: 16px;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        .stat span {
+            margin-left: 8px;
+        }
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px 16px;
+            font-weight: 500;
+            text-align: center;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        .btn-secondary {
+            background: #10b981;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #059669;
+        }
+        .new-pattern {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+        .new-pattern:hover {
+            border-color: #9ca3af;
+        }
+        .icon-large {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #9ca3af;
+        }
+        .hidden {
+            display: none;
+        }
+        .result-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            padding: 16px;
+            border-radius: 6px;
+        }
+        .stat-card.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .stat-card.warning {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+        }
+        .stat-card.info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+        }
+        .stat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .stat-header span {
+            margin-right: 8px;
+        }
+        .stat-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .stat-value {
+            font-size: 12px;
+        }
+        .success .stat-title { color: #166534; }
+        .success .stat-value { color: #15803d; }
+        .warning .stat-title { color: #9a3412; }
+        .warning .stat-value { color: #ea580c; }
+        .info .stat-title { color: #1e40af; }
+        .info .stat-value { color: #2563eb; }
+        .map-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .map-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .map-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .btn-map {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-map.show {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .btn-map.hide {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 6px;
+            border: 2px solid #e5e7eb;
+        }
+        .map-status {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .map-status.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .assignment-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .assignment-header {
+            margin-bottom: 16px;
+        }
+        .assignment-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .assignment-info {
+            color: #6b7280;
+        }
+        .assignment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 768px) {
+            .assignment-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .section-header {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .section-header span {
+            margin-right: 8px;
+        }
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .item {
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+        .item.child {
+            background: #f9fafb;
+        }
+        .item.route {
+            background: #eff6ff;
+        }
+        .item.final {
+            background: #f0fdf4;
+        }
+        .item-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            margin-right: 12px;
+        }
+        .item.route .item-number {
+            background: #2563eb;
+        }
+        .item.final .item-number {
+            background: #059669;
+        }
+        .item-content {
+            flex: 1;
+        }
+        .item-title {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .item-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .item-detail {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .restriction {
+            font-size: 12px;
+            color: #dc2626;
+            margin-top: 4px;
+        }
+        .notice {
+            background: #ecfdf5;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .notice-title {
+            font-weight: 600;
+            color: #166534;
+            margin-bottom: 4px;
+        }
+        .notice-text {
+            color: #15803d;
+            font-size: 14px;
+        }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div class="min-h-screen">
-        <!-- ヘッダー -->
-        <div class="bg-white shadow-sm">
-            <div class="max-w-7xl mx-auto px-6 py-4">
-                <h1 class="text-2xl font-bold text-gray-800">🚐 福祉施設児童送迎システム</h1>
-                <p class="text-gray-600">GitHub Pages公開版 - Google Maps API統合済み</p>
-            </div>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🚐 福祉施設児童送迎システム</h1>
+            <p>GitHub Pages公開版 - Google Maps API統合済み</p>
         </div>
+    </div>
 
-        <!-- メインコンテンツ -->
-        <div class="py-8">
-            <div class="max-w-6xl mx-auto p-6">
-                <div class="text-center mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🚐 送迎パターン選択</h2>
-                    <p class="text-gray-600">保存されたパターンから選択するか、新しく作成してください</p>
+    <div class="main">
+        <div class="container">
+            <div class="section-title">
+                <h2>🚐 送迎パターン選択</h2>
+                <p>保存されたパターンから選択するか、新しく作成してください</p>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">平日パターン</div>
+                            <div class="card-date">2025-07-01</div>
+                        </div>
+                        <span>📅</span>
+                    </div>
+                    
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span>👥</span>
+                            <span>運転手 3人</span>
+                        </div>
+                        <div class="stat">
+                            <span>🚗</span>
+                            <span>車両 2台</span>
+                        </div>
+                        <div class="stat">
+                            <span>👥</span>
+                            <span>児童 4人</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="loadPattern('weekday')">
+                        このパターンを使用
+                    </button>
                 </div>
 
-                <!-- パターンカード -->
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <!-- 平日パターン -->
-                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-800">平日パターン</h3>
-                                <p class="text-sm text-gray-500">2025-07-01</p>
-                            </div>
-                            <span class="text-gray-400">📅</span>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">土曜パターン</div>
+                            <div class="card-date">2025-06-28</div>
                         </div>
-                        
-                        <div class="space-y-2 mb-4">
-                            <div class="flex items-center text-sm text-gray-600">
-                                <span class="mr-2">👥</span>
-                                <span>運転手 3人</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-600">
-                                <span class="mr-2">🚗</span>
-                                <span>車両 2台</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-600">
-                                <span class="mr-2">👥</span>
-                                <span>児童 4人</span>
-                            </div>
-                        </div>
-                        
-                        <button onclick="loadPattern('weekday')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                            このパターンを使用
-                        </button>
+                        <span>📅</span>
                     </div>
-
-                    <!-- 土曜パターン -->
-                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-800">土曜パターン</h3>
-                                <p class="text-sm text-gray-500">2025-06-28</p>
-                            </div>
-                            <span class="text-gray-400">📅</span>
+                    
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span>👥</span>
+                            <span>運転手 2人</span>
                         </div>
-                        
-                        <div class="space-y-2 mb-4">
-                            <div class="flex items-center text-sm text-gray-600">
-                                <span class="mr-2">👥</span>
-                                <span>運転手 2人</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-600">
-                                <span class="mr-2">🚗</span>
-                                <span>車両 1台</span>
-                            </div>
-                            <div class="flex items-center text-sm text-gray-600">
-                                <span class="mr-2">👥</span>
-                                <span>児童 2人</span>
-                            </div>
+                        <div class="stat">
+                            <span>🚗</span>
+                            <span>車両 1台</span>
                         </div>
-                        
-                        <button onclick="loadPattern('saturday')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                            このパターンを使用
-                        </button>
+                        <div class="stat">
+                            <span>👥</span>
+                            <span>児童 2人</span>
+                        </div>
                     </div>
-
-                    <!-- 新規作成 -->
-                    <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center hover:border-gray-400 transition-colors">
-                        <span class="text-4xl text-gray-400 mb-4">➕</span>
-                        <h3 class="text-lg font-medium text-gray-600 mb-2">新しいパターン</h3>
-                        <button onclick="createNew()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
-                            新規作成
-                        </button>
-                    </div>
+                    
+                    <button class="btn btn-primary" onclick="loadPattern('saturday')">
+                        このパターンを使用
+                    </button>
                 </div>
 
-                <!-- 結果表示エリア -->
-                <div id="resultArea" class="hidden">
-                    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">🎯 送迎プラン結果</h3>
+                <div class="card new-pattern">
+                    <div class="icon-large">➕</div>
+                    <div class="card-title" style="margin-bottom: 8px;">新しいパターン</div>
+                    <button class="btn btn-secondary" onclick="createNew()">
+                        新規作成
+                    </button>
+                </div>
+            </div>
+
+            <div id="resultArea" class="hidden">
+                <div class="result-section">
+                    <h3 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 16px;">🎯 送迎プラン結果</h3>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card success">
+                            <div class="stat-header">
+                                <span>✅</span>
+                                <div>
+                                    <div class="stat-title">割り当て完了</div>
+                                    <div class="stat-value" id="vehicleCount">2台の車両</div>
+                                </div>
+                            </div>
+                        </div>
                         
-                        <div class="grid md:grid-cols-3 gap-4 mb-6">
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                                <div class="flex items-center">
-                                    <span class="mr-2">✅</span>
-                                    <div>
-                                        <div class="font-semibold text-green-800">割り当て完了</div>
-                                        <div class="text-sm text-green-600" id="vehicleCount">2台の車両</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                                <div class="flex items-center">
-                                    <span class="mr-2">⏰</span>
-                                    <div>
-                                        <div class="font-semibold text-orange-800">最長乗車時間</div>
-                                        <div class="text-sm text-orange-600" id="maxRideTime">39分 (Eちゃん)</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <div class="flex items-center">
-                                    <span class="mr-2">🗺️</span>
-                                    <div>
-                                        <div class="font-semibold text-blue-800">Google Maps</div>
-                                        <div class="text-sm text-blue-600">統合済み</div>
-                                    </div>
+                        <div class="stat-card warning">
+                            <div class="stat-header">
+                                <span>⏰</span>
+                                <div>
+                                    <div class="stat-title">最長乗車時間</div>
+                                    <div class="stat-value" id="maxRideTime">39分 (Eちゃん)</div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="stat-card info">
+                            <div class="stat-header">
+                                <span>🗺️</span>
+                                <div>
+                                    <div class="stat-title">Google Maps</div>
+                                    <div class="stat-value">統合済み</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <!-- Google Maps表示エリア -->
-                        <div class="bg-white rounded-lg shadow p-4 mb-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-lg font-semibold">🗺️ リアルタイム送迎ルートマップ</h3>
-                                <div class="flex space-x-3">
-                                    <select id="routeSelect" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                                        <option value="">ルートを選択</option>
-                                    </select>
-                                    <button onclick="toggleMap()" id="mapToggle" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
-                                        🗺️ 地図を表示
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div id="mapContainer" class="hidden">
-                                <div id="map" style="height: 400px; width: 100%;" class="rounded-lg border-2 border-gray-200"></div>
-                                <div id="mapStatus" class="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
-                                    <span class="text-green-800 text-sm font-medium">
-                                        ✅ Google Maps統合準備完了！ルートを選択してください
-                                    </span>
-                                </div>
+                    <div class="map-section">
+                        <div class="map-header">
+                            <div class="map-title">🗺️ リアルタイム送迎ルートマップ</div>
+                            <div class="map-controls">
+                                <select id="routeSelect" class="select">
+                                    <option value="">ルートを選択</option>
+                                </select>
+                                <button onclick="toggleMap()" id="mapToggle" class="btn-map show">
+                                    🗺️ 地図を表示
+                                </button>
                             </div>
                         </div>
+                        
+                        <div id="mapContainer" class="hidden">
+                            <div id="map"></div>
+                            <div id="mapStatus" class="map-status success">
+                                <span>✅ Google Maps統合準備完了！ルートを選択してください</span>
+                            </div>
+                        </div>
+                    </div>
 
-                        <!-- 送迎プラン詳細 -->
-                        <div id="assignments" class="space-y-6">
-                            <!-- ここに送迎プランが表示される -->
-                        </div>
+                    <div id="assignments">
+                        <!-- ここに送迎プランが表示される -->
                     </div>
                 </div>
+            </div>
 
-                <!-- 説明 -->
-                <div class="text-center">
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 inline-block">
-                        <p class="text-green-800 font-medium">🎉 GitHub Pages公開版</p>
-                        <p class="text-green-600 text-sm mt-1">
-                            Google Maps API統合済み | リアルタイムルート表示対応
-                        </p>
-                    </div>
+            <div class="notice">
+                <div class="notice-title">🎉 GitHub Pages公開版</div>
+                <div class="notice-text">
+                    Google Maps API統合済み | リアルタイムルート表示対応
                 </div>
             </div>
         </div>
@@ -256,55 +601,7 @@
             });
 
             // 送迎プラン表示
-            const assignmentsDiv = document.getElementById('assignments');
-            assignmentsDiv.innerHTML = '';
-
-            pattern.assignments.forEach(assignment => {
-                const div = document.createElement('div');
-                div.className = 'bg-white rounded-lg shadow-lg p-6 border border-gray-200';
-                div.innerHTML = `
-                    <div class="mb-4">
-                        <h3 class="text-xl font-semibold text-gray-800">${assignment.driver.name}さん - ${assignment.vehicle.name}</h3>
-                        <p class="text-gray-600">${assignment.vehicle.capacity}人乗り • 推定時間: ${assignment.estimatedTime}分</p>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-medium text-gray-700 mb-3">👥 担当児童 (${assignment.children.length}人)</h4>
-                            <div class="space-y-2">
-                                ${assignment.children.map(child => `
-                                    <div class="p-3 bg-gray-50 rounded-lg">
-                                        <div class="font-medium">${child.name}</div>
-                                        <div class="text-sm text-gray-600">${child.address}</div>
-                                        ${child.restrictions ? `<div class="text-xs text-red-600">制限: ${child.restrictions}</div>` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-700 mb-3">📍 送迎ルート</h4>
-                            <div class="space-y-2">
-                                ${assignment.children.map((child, index) => `
-                                    <div class="flex items-center p-3 bg-blue-50 rounded-lg">
-                                        <div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-medium mr-3">
-                                            ${index + 1}
-                                        </div>
-                                        <div class="flex-1">
-                                            <div class="font-medium">${child.school}</div>
-                                            <div class="text-sm text-blue-600">${child.time} 迎え</div>
-                                            <div class="text-xs text-gray-500">${child.address}</div>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                                <div class="flex items-center p-3 bg-green-50 rounded-lg">
-                                    <div class="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-medium mr-3">✓</div>
-                                    <div class="font-medium text-green-700">施設へ帰着</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                assignmentsDiv.appendChild(div);
-            });
+            displayAssignments(pattern.assignments);
 
             // ルート選択イベント
             select.onchange = function() {
@@ -317,6 +614,72 @@
 
             // 結果エリアまでスクロール
             document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 送迎プラン表示
+        function displayAssignments(assignments) {
+            const container = document.getElementById('assignments');
+            container.innerHTML = '';
+
+            assignments.forEach(assignment => {
+                const div = document.createElement('div');
+                div.className = 'assignment-card';
+                
+                const childrenHtml = assignment.children.map(child => `
+                    <div class="item child">
+                        <div class="item-content">
+                            <div class="item-title">${child.name}</div>
+                            <div class="item-subtitle">${child.address}</div>
+                            ${child.restrictions ? `<div class="restriction">制限: ${child.restrictions}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                const routeHtml = assignment.children.map((child, index) => `
+                    <div class="item route">
+                        <div class="item-number">${index + 1}</div>
+                        <div class="item-content">
+                            <div class="item-title">${child.school}</div>
+                            <div class="item-subtitle">${child.time} 迎え</div>
+                            <div class="item-detail">${child.address}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                div.innerHTML = `
+                    <div class="assignment-header">
+                        <div class="assignment-title">${assignment.driver.name}さん - ${assignment.vehicle.name}</div>
+                        <div class="assignment-info">${assignment.vehicle.capacity}人乗り • 推定時間: ${assignment.estimatedTime}分</div>
+                    </div>
+                    <div class="assignment-grid">
+                        <div>
+                            <div class="section-header">
+                                <span>👥</span>
+                                担当児童 (${assignment.children.length}人)
+                            </div>
+                            <div class="item-list">
+                                ${childrenHtml}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="section-header">
+                                <span>📍</span>
+                                送迎ルート
+                            </div>
+                            <div class="item-list">
+                                ${routeHtml}
+                                <div class="item final">
+                                    <div class="item-number">✓</div>
+                                    <div class="item-content">
+                                        <div class="item-title">施設へ帰着</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
         }
 
         // 新規作成
@@ -332,12 +695,12 @@
             if (mapVisible) {
                 container.classList.add('hidden');
                 button.textContent = '🗺️ 地図を表示';
-                button.className = 'px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200';
+                button.className = 'btn-map show';
                 mapVisible = false;
             } else {
                 container.classList.remove('hidden');
                 button.textContent = '🗺️ 地図を閉じる';
-                button.className = 'px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200';
+                button.className = 'btn-map hide';
                 mapVisible = true;
                 initMap();
             }
@@ -388,6 +751,9 @@
             script.src = 'https://maps.googleapis.com/maps/js?key=AIzaSyA-hMVylLLCiSjGvZsGr9mnkAH1RSHh1uI&callback=initMap';
             script.async = true;
             script.defer = true;
+            script.onerror = function() {
+                document.getElementById('mapStatus').innerHTML = '<span style="color: #dc2626;">❌ Google Maps APIの読み込みに失敗しました</span>';
+            };
             document.head.appendChild(script);
         }
 
@@ -412,24 +778,18 @@
                 if (status === 'OK') {
                     directionsRenderer.setDirections(result);
                     document.getElementById('mapStatus').innerHTML = `
-                        <span class="text-green-800 text-sm font-medium">
-                            ✅ ${assignment.driver.name}さんのルートを表示中
-                        </span>
+                        <span style="color: #166534;">✅ ${assignment.driver.name}さんのルートを表示中</span>
                     `;
                 } else {
                     document.getElementById('mapStatus').innerHTML = `
-                        <span class="text-red-800 text-sm font-medium">
-                            ❌ ルート計算に失敗しました: ${status}
-                        </span>
+                        <span style="color: #dc2626;">❌ ルート計算に失敗しました: ${status}</span>
                     `;
                 }
             });
         }
 
         // 初期化
-        window.onload = function() {
-            console.log('福祉施設児童送迎システム初期化完了');
-        };
+        console.log('福祉施設児童送迎システム初期化完了');
     </script>
 </body>
 </html>
