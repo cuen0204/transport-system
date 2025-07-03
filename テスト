@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Maps API テスト</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Google Maps API テスト</h1>
+    
+    <div id="status" class="status info">
+        📡 Google Maps API読み込み中...
+    </div>
+    
+    <div id="map"></div>
+    
+    <div style="margin-top: 20px;">
+        <h3>📋 診断情報</h3>
+        <ul id="diagnostics"></ul>
+    </div>
+
+    <script>
+        const diagnostics = document.getElementById('diagnostics');
+        const status = document.getElementById('status');
+        
+        function addDiagnostic(message, isError = false) {
+            const li = document.createElement('li');
+            li.textContent = message;
+            li.style.color = isError ? '#dc3545' : '#28a745';
+            diagnostics.appendChild(li);
+        }
+        
+        function updateStatus(message, type = 'info') {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        // 診断開始
+        addDiagnostic(`🌐 現在のURL: ${window.location.href}`);
+        addDiagnostic(`🕐 テスト開始時刻: ${new Date().toLocaleString()}`);
+        
+        // Google Maps API読み込み
+        window.initMap = function() {
+            try {
+                addDiagnostic('✅ initMap関数が呼ばれました');
+                
+                if (!window.google) {
+                    throw new Error('Google オブジェクトが存在しません');
+                }
+                
+                if (!window.google.maps) {
+                    throw new Error('Google Maps オブジェクトが存在しません');
+                }
+                
+                const map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: 35.6762, lng: 139.6503 },
+                    zoom: 13
+                });
+                
+                new google.maps.Marker({
+                    position: { lat: 35.6762, lng: 139.6503 },
+                    map: map,
+                    title: 'テスト地点'
+                });
+                
+                addDiagnostic('✅ マップ初期化完了');
+                addDiagnostic('✅ マーカー配置完了');
+                updateStatus('🎉 Google Maps API読み込み成功！', 'success');
+                
+            } catch (error) {
+                addDiagnostic(`❌ マップ初期化エラー: ${error.message}`, true);
+                updateStatus(`❌ マップ初期化失敗: ${error.message}`, 'error');
+            }
+        };
+        
+        // API読み込み
+        function loadGoogleMaps() {
+            const script = document.createElement('script');
+            const apiKey = 'AIzaSyA-hMVylLLCiSjGvZsGr9mnkAH1RSHh1uI';
+            script.src = `https://maps.googleapis.com/maps/js?key=${apiKey}&callback=initMap`;
+            script.async = true;
+            script.defer = true;
+            
+            script.onload = function() {
+                addDiagnostic('✅ Google Maps APIスクリプト読み込み完了');
+            };
+            
+            script.onerror = function() {
+                addDiagnostic('❌ Google Maps APIスクリプト読み込み失敗', true);
+                updateStatus('❌ Google Maps API読み込み失敗', 'error');
+                
+                // 詳細エラー情報を追加
+                addDiagnostic('🔍 考えられる原因:', true);
+                addDiagnostic('  - APIキーが無効または削除された', true);
+                addDiagnostic('  - Maps JavaScript APIが有効になっていない', true);
+                addDiagnostic('  - ウェブサイト制限の設定ミス', true);
+                addDiagnostic('  - 請求アカウントが設定されていない', true);
+                addDiagnostic('  - プロジェクトが停止されている', true);
+            };
+            
+            document.head.appendChild(script);
+            addDiagnostic('📡 Google Maps APIスクリプト要素を追加');
+        }
+        
+        // ページ読み込み完了後に実行
+        document.addEventListener('DOMContentLoaded', function() {
+            addDiagnostic('✅ DOM読み込み完了');
+            loadGoogleMaps();
+        });
+    </script>
+</body>
+</html>
