@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>福祉施設児童送迎システム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- ヘッダー -->
+        <div class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <h1 class="text-2xl font-bold text-gray-800">🚐 福祉施設児童送迎システム</h1>
+                <p class="text-gray-600">GitHub Pages公開版 - Google Maps API統合済み</p>
+            </div>
+        </div>
+
+        <!-- メインコンテンツ -->
+        <div class="py-8">
+            <div class="max-w-6xl mx-auto p-6">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">🚐 送迎パターン選択</h2>
+                    <p class="text-gray-600">保存されたパターンから選択するか、新しく作成してください</p>
+                </div>
+
+                <!-- パターンカード -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- 平日パターン -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">平日パターン</h3>
+                                <p class="text-sm text-gray-500">2025-07-01</p>
+                            </div>
+                            <span class="text-gray-400">📅</span>
+                        </div>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <span class="mr-2">👥</span>
+                                <span>運転手 3人</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <span class="mr-2">🚗</span>
+                                <span>車両 2台</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <span class="mr-2">👥</span>
+                                <span>児童 4人</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="loadPattern('weekday')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                            このパターンを使用
+                        </button>
+                    </div>
+
+                    <!-- 土曜パターン -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">土曜パターン</h3>
+                                <p class="text-sm text-gray-500">2025-06-28</p>
+                            </div>
+                            <span class="text-gray-400">📅</span>
+                        </div>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <span class="mr-2">👥</span>
+                                <span>運転手 2人</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <span class="mr-2">🚗</span>
+                                <span>車両 1台</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <span class="mr-2">👥</span>
+                                <span>児童 2人</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="loadPattern('saturday')" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                            このパターンを使用
+                        </button>
+                    </div>
+
+                    <!-- 新規作成 -->
+                    <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center hover:border-gray-400 transition-colors">
+                        <span class="text-4xl text-gray-400 mb-4">➕</span>
+                        <h3 class="text-lg font-medium text-gray-600 mb-2">新しいパターン</h3>
+                        <button onclick="createNew()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                            新規作成
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 結果表示エリア -->
+                <div id="resultArea" class="hidden">
+                    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">🎯 送迎プラン結果</h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <span class="mr-2">✅</span>
+                                    <div>
+                                        <div class="font-semibold text-green-800">割り当て完了</div>
+                                        <div class="text-sm text-green-600" id="vehicleCount">2台の車両</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <span class="mr-2">⏰</span>
+                                    <div>
+                                        <div class="font-semibold text-orange-800">最長乗車時間</div>
+                                        <div class="text-sm text-orange-600" id="maxRideTime">39分 (Eちゃん)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-center">
+                                    <span class="mr-2">🗺️</span>
+                                    <div>
+                                        <div class="font-semibold text-blue-800">Google Maps</div>
+                                        <div class="text-sm text-blue-600">統合済み</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Google Maps表示エリア -->
+                        <div class="bg-white rounded-lg shadow p-4 mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold">🗺️ リアルタイム送迎ルートマップ</h3>
+                                <div class="flex space-x-3">
+                                    <select id="routeSelect" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                        <option value="">ルートを選択</option>
+                                    </select>
+                                    <button onclick="toggleMap()" id="mapToggle" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
+                                        🗺️ 地図を表示
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="mapContainer" class="hidden">
+                                <div id="map" style="height: 400px; width: 100%;" class="rounded-lg border-2 border-gray-200"></div>
+                                <div id="mapStatus" class="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                                    <span class="text-green-800 text-sm font-medium">
+                                        ✅ Google Maps統合準備完了！ルートを選択してください
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 送迎プラン詳細 -->
+                        <div id="assignments" class="space-y-6">
+                            <!-- ここに送迎プランが表示される -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 説明 -->
+                <div class="text-center">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 inline-block">
+                        <p class="text-green-800 font-medium">🎉 GitHub Pages公開版</p>
+                        <p class="text-green-600 text-sm mt-1">
+                            Google Maps API統合済み | リアルタイムルート表示対応
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let map = null;
+        let directionsService = null;
+        let directionsRenderer = null;
+        let mapVisible = false;
+
+        // パターンデータ
+        const patterns = {
+            weekday: {
+                assignments: [
+                    {
+                        id: 1,
+                        driver: { name: '田中', age: 35, gender: '女性' },
+                        vehicle: { name: 'ノア', capacity: 8 },
+                        children: [
+                            { name: 'Aくん', school: '〇〇小学校', time: '13:10', address: '〇〇町1-2', lat: 35.6762, lng: 139.6503 },
+                            { name: 'Eちゃん', school: '△△小学校', time: '14:25', address: '△△市2-1-105', lat: 35.6756, lng: 139.6598, restrictions: '女性希望' }
+                        ],
+                        estimatedTime: 45
+                    },
+                    {
+                        id: 2,
+                        driver: { name: '眞田', age: 32, gender: '男性' },
+                        vehicle: { name: 'キャラバン', capacity: 10 },
+                        children: [
+                            { name: 'Bくん', school: '△△小学校', time: '14:25', address: '△△市4-8-201', lat: 35.6785, lng: 139.6582 },
+                            { name: 'Cくん', school: '✕✕中学校', time: '14:45', address: '✕✕町7-8', lat: 35.6821, lng: 139.6536 }
+                        ],
+                        estimatedTime: 40
+                    }
+                ],
+                maxRideTime: 39,
+                longestRideChild: 'Eちゃん'
+            },
+            saturday: {
+                assignments: [
+                    {
+                        id: 1,
+                        driver: { name: '井上', age: 23, gender: '女性' },
+                        vehicle: { name: 'スイフト', capacity: 5 },
+                        children: [
+                            { name: 'Bくん', school: '△△小学校', time: '14:25', address: '△△市4-8-201', lat: 35.6785, lng: 139.6582 },
+                            { name: 'Eちゃん', school: '△△小学校', time: '14:25', address: '△△市2-1-105', lat: 35.6756, lng: 139.6598, restrictions: '女性希望' }
+                        ],
+                        estimatedTime: 35
+                    }
+                ],
+                maxRideTime: 27,
+                longestRideChild: 'Eちゃん'
+            }
+        };
+
+        // パターン読み込み
+        function loadPattern(patternType) {
+            const pattern = patterns[patternType];
+            if (!pattern) return;
+
+            // 結果エリアを表示
+            document.getElementById('resultArea').classList.remove('hidden');
+
+            // 統計更新
+            document.getElementById('vehicleCount').textContent = `${pattern.assignments.length}台の車両`;
+            document.getElementById('maxRideTime').textContent = `${pattern.maxRideTime}分 (${pattern.longestRideChild})`;
+
+            // ルート選択更新
+            const select = document.getElementById('routeSelect');
+            select.innerHTML = '<option value="">ルートを選択</option>';
+            pattern.assignments.forEach(assignment => {
+                const option = document.createElement('option');
+                option.value = assignment.id;
+                option.textContent = `${assignment.driver.name}さん - ${assignment.vehicle.name} (${assignment.children.length}人)`;
+                select.appendChild(option);
+            });
+
+            // 送迎プラン表示
+            const assignmentsDiv = document.getElementById('assignments');
+            assignmentsDiv.innerHTML = '';
+
+            pattern.assignments.forEach(assignment => {
+                const div = document.createElement('div');
+                div.className = 'bg-white rounded-lg shadow-lg p-6 border border-gray-200';
+                div.innerHTML = `
+                    <div class="mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800">${assignment.driver.name}さん - ${assignment.vehicle.name}</h3>
+                        <p class="text-gray-600">${assignment.vehicle.capacity}人乗り • 推定時間: ${assignment.estimatedTime}分</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-medium text-gray-700 mb-3">👥 担当児童 (${assignment.children.length}人)</h4>
+                            <div class="space-y-2">
+                                ${assignment.children.map(child => `
+                                    <div class="p-3 bg-gray-50 rounded-lg">
+                                        <div class="font-medium">${child.name}</div>
+                                        <div class="text-sm text-gray-600">${child.address}</div>
+                                        ${child.restrictions ? `<div class="text-xs text-red-600">制限: ${child.restrictions}</div>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-700 mb-3">📍 送迎ルート</h4>
+                            <div class="space-y-2">
+                                ${assignment.children.map((child, index) => `
+                                    <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+                                        <div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-medium mr-3">
+                                            ${index + 1}
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium">${child.school}</div>
+                                            <div class="text-sm text-blue-600">${child.time} 迎え</div>
+                                            <div class="text-xs text-gray-500">${child.address}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                                <div class="flex items-center p-3 bg-green-50 rounded-lg">
+                                    <div class="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-medium mr-3">✓</div>
+                                    <div class="font-medium text-green-700">施設へ帰着</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                assignmentsDiv.appendChild(div);
+            });
+
+            // ルート選択イベント
+            select.onchange = function() {
+                const assignmentId = parseInt(this.value);
+                const assignment = pattern.assignments.find(a => a.id === assignmentId);
+                if (assignment && mapVisible) {
+                    calculateRoute(assignment);
+                }
+            };
+
+            // 結果エリアまでスクロール
+            document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 新規作成
+        function createNew() {
+            alert('新規作成機能は開発中です。現在は既存パターンをお使いください。');
+        }
+
+        // Google Maps表示切り替え
+        function toggleMap() {
+            const container = document.getElementById('mapContainer');
+            const button = document.getElementById('mapToggle');
+            
+            if (mapVisible) {
+                container.classList.add('hidden');
+                button.textContent = '🗺️ 地図を表示';
+                button.className = 'px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200';
+                mapVisible = false;
+            } else {
+                container.classList.remove('hidden');
+                button.textContent = '🗺️ 地図を閉じる';
+                button.className = 'px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200';
+                mapVisible = true;
+                initMap();
+            }
+        }
+
+        // Google Maps初期化
+        function initMap() {
+            if (!window.google) {
+                loadGoogleMaps();
+                return;
+            }
+
+            if (!map) {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: 35.6762, lng: 139.6503 },
+                    zoom: 13
+                });
+
+                directionsService = new google.maps.DirectionsService();
+                directionsRenderer = new google.maps.DirectionsRenderer({
+                    polylineOptions: {
+                        strokeColor: '#2563eb',
+                        strokeWeight: 4
+                    }
+                });
+                directionsRenderer.setMap(map);
+
+                // 施設マーカー
+                new google.maps.Marker({
+                    position: { lat: 35.6762, lng: 139.6503 },
+                    map: map,
+                    title: '福祉施設',
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#16a34a',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2
+                    }
+                });
+            }
+        }
+
+        // Google Maps API読み込み
+        function loadGoogleMaps() {
+            const script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/js?key=AIzaSyA-hMVylLLCiSjGvZsGr9mnkAH1RSHh1uI&callback=initMap';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+
+        // ルート計算
+        function calculateRoute(assignment) {
+            if (!directionsService || !directionsRenderer) return;
+
+            const waypoints = assignment.children.map(child => ({
+                location: { lat: child.lat, lng: child.lng },
+                stopover: true
+            }));
+
+            const request = {
+                origin: { lat: 35.6762, lng: 139.6503 },
+                destination: { lat: 35.6762, lng: 139.6503 },
+                waypoints: waypoints,
+                optimizeWaypoints: true,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+
+            directionsService.route(request, (result, status) => {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
+                    document.getElementById('mapStatus').innerHTML = `
+                        <span class="text-green-800 text-sm font-medium">
+                            ✅ ${assignment.driver.name}さんのルートを表示中
+                        </span>
+                    `;
+                } else {
+                    document.getElementById('mapStatus').innerHTML = `
+                        <span class="text-red-800 text-sm font-medium">
+                            ❌ ルート計算に失敗しました: ${status}
+                        </span>
+                    `;
+                }
+            });
+        }
+
+        // 初期化
+        window.onload = function() {
+            console.log('福祉施設児童送迎システム初期化完了');
+        };
+    </script>
+</body>
+</html>
