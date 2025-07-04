@@ -1,795 +1,125 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>福祉施設児童送迎システム</title>
+    <title>Google Maps API テスト</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background-color: #f9fafb;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-        .header {
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding: 16px 0;
-        }
-        .header h1 {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-        .header p {
-            color: #6b7280;
-        }
-        .main {
-            padding: 32px 0;
-        }
-        .section-title {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        .section-title h2 {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1f2937;
-            margin-bottom: 8px;
-        }
-        .section-title p {
-            color: #6b7280;
-        }
-        .grid {
-            display: grid;
-            gap: 24px;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            margin-bottom: 32px;
-        }
-        .card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 24px;
-            transition: box-shadow 0.2s;
-        }
-        .card:hover {
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-        .card-date {
-            font-size: 14px;
-            color: #6b7280;
-        }
-        .card-stats {
-            margin-bottom: 16px;
-        }
-        .stat {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-        .stat span {
-            margin-left: 8px;
-        }
-        .btn {
-            display: inline-block;
-            width: 100%;
-            padding: 12px 16px;
-            font-weight: 500;
-            text-align: center;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
-        .btn-secondary {
-            background: #10b981;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #059669;
-        }
-        .new-pattern {
-            background: #f9fafb;
-            border: 2px dashed #d1d5db;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-        }
-        .new-pattern:hover {
-            border-color: #9ca3af;
-        }
-        .icon-large {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: #9ca3af;
-        }
-        .hidden {
-            display: none;
-        }
-        .result-section {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            padding: 16px;
-            border-radius: 6px;
-        }
-        .stat-card.success {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-        }
-        .stat-card.warning {
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-        }
-        .stat-card.info {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-        }
-        .stat-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .stat-header span {
-            margin-right: 8px;
-        }
-        .stat-title {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .stat-value {
-            font-size: 12px;
-        }
-        .success .stat-title { color: #166534; }
-        .success .stat-value { color: #15803d; }
-        .warning .stat-title { color: #9a3412; }
-        .warning .stat-value { color: #ea580c; }
-        .info .stat-title { color: #1e40af; }
-        .info .stat-value { color: #2563eb; }
-        .map-section {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-        .map-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .map-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
-        }
-        .map-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .select {
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        .btn-map {
-            padding: 8px 16px;
-            font-size: 14px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .btn-map.show {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-        .btn-map.hide {
-            background: #fef2f2;
-            color: #dc2626;
-        }
         #map {
             height: 400px;
             width: 100%;
-            border-radius: 6px;
-            border: 2px solid #e5e7eb;
         }
-        .map-status {
-            margin-top: 16px;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
         }
-        .map-status.success {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: #166534;
-        }
-        .assignment-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border: 1px solid #e5e7eb;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-        .assignment-header {
-            margin-bottom: 16px;
-        }
-        .assignment-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-        .assignment-info {
-            color: #6b7280;
-        }
-        .assignment-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-        @media (max-width: 768px) {
-            .assignment-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .section-header {
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-        }
-        .section-header span {
-            margin-right: 8px;
-        }
-        .item-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .item {
-            padding: 12px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-        }
-        .item.child {
-            background: #f9fafb;
-        }
-        .item.route {
-            background: #eff6ff;
-        }
-        .item.final {
-            background: #f0fdf4;
-        }
-        .item-number {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: white;
-            margin-right: 12px;
-        }
-        .item.route .item-number {
-            background: #2563eb;
-        }
-        .item.final .item-number {
-            background: #059669;
-        }
-        .item-content {
-            flex: 1;
-        }
-        .item-title {
-            font-weight: 500;
-            margin-bottom: 2px;
-        }
-        .item-subtitle {
-            font-size: 14px;
-            color: #6b7280;
-        }
-        .item-detail {
-            font-size: 12px;
-            color: #9ca3af;
-        }
-        .restriction {
-            font-size: 12px;
-            color: #dc2626;
-            margin-top: 4px;
-        }
-        .notice {
-            background: #ecfdf5;
-            border: 1px solid #bbf7d0;
-            border-radius: 6px;
-            padding: 16px;
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        .notice-title {
-            font-weight: 600;
-            color: #166534;
-            margin-bottom: 4px;
-        }
-        .notice-text {
-            color: #15803d;
-            font-size: 14px;
-        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="container">
-            <h1>🚐 福祉施設児童送迎システム</h1>
-            <p>GitHub Pages公開版 - Google Maps API統合済み</p>
-        </div>
+    <h1>🗺️ Google Maps API テスト</h1>
+    
+    <div id="status" class="status info">
+        📡 Google Maps API読み込み中...
     </div>
-
-    <div class="main">
-        <div class="container">
-            <div class="section-title">
-                <h2>🚐 送迎パターン選択</h2>
-                <p>保存されたパターンから選択するか、新しく作成してください</p>
-            </div>
-
-            <div class="grid">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">平日パターン</div>
-                            <div class="card-date">2025-07-01</div>
-                        </div>
-                        <span>📅</span>
-                    </div>
-                    
-                    <div class="card-stats">
-                        <div class="stat">
-                            <span>👥</span>
-                            <span>運転手 3人</span>
-                        </div>
-                        <div class="stat">
-                            <span>🚗</span>
-                            <span>車両 2台</span>
-                        </div>
-                        <div class="stat">
-                            <span>👥</span>
-                            <span>児童 4人</span>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="loadPattern('weekday')">
-                        このパターンを使用
-                    </button>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">土曜パターン</div>
-                            <div class="card-date">2025-06-28</div>
-                        </div>
-                        <span>📅</span>
-                    </div>
-                    
-                    <div class="card-stats">
-                        <div class="stat">
-                            <span>👥</span>
-                            <span>運転手 2人</span>
-                        </div>
-                        <div class="stat">
-                            <span>🚗</span>
-                            <span>車両 1台</span>
-                        </div>
-                        <div class="stat">
-                            <span>👥</span>
-                            <span>児童 2人</span>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="loadPattern('saturday')">
-                        このパターンを使用
-                    </button>
-                </div>
-
-                <div class="card new-pattern">
-                    <div class="icon-large">➕</div>
-                    <div class="card-title" style="margin-bottom: 8px;">新しいパターン</div>
-                    <button class="btn btn-secondary" onclick="createNew()">
-                        新規作成
-                    </button>
-                </div>
-            </div>
-
-            <div id="resultArea" class="hidden">
-                <div class="result-section">
-                    <h3 style="font-size: 20px; font-weight: bold; color: #1f2937; margin-bottom: 16px;">🎯 送迎プラン結果</h3>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card success">
-                            <div class="stat-header">
-                                <span>✅</span>
-                                <div>
-                                    <div class="stat-title">割り当て完了</div>
-                                    <div class="stat-value" id="vehicleCount">2台の車両</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card warning">
-                            <div class="stat-header">
-                                <span>⏰</span>
-                                <div>
-                                    <div class="stat-title">最長乗車時間</div>
-                                    <div class="stat-value" id="maxRideTime">39分 (Eちゃん)</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card info">
-                            <div class="stat-header">
-                                <span>🗺️</span>
-                                <div>
-                                    <div class="stat-title">Google Maps</div>
-                                    <div class="stat-value">統合済み</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="map-section">
-                        <div class="map-header">
-                            <div class="map-title">🗺️ リアルタイム送迎ルートマップ</div>
-                            <div class="map-controls">
-                                <select id="routeSelect" class="select">
-                                    <option value="">ルートを選択</option>
-                                </select>
-                                <button onclick="toggleMap()" id="mapToggle" class="btn-map show">
-                                    🗺️ 地図を表示
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="mapContainer" class="hidden">
-                            <div id="map"></div>
-                            <div id="mapStatus" class="map-status success">
-                                <span>✅ Google Maps統合準備完了！ルートを選択してください</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="assignments">
-                        <!-- ここに送迎プランが表示される -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="notice">
-                <div class="notice-title">🎉 GitHub Pages公開版</div>
-                <div class="notice-text">
-                    Google Maps API統合済み | リアルタイムルート表示対応
-                </div>
-            </div>
-        </div>
+    
+    <div id="map"></div>
+    
+    <div style="margin-top: 20px;">
+        <h3>📋 診断情報</h3>
+        <ul id="diagnostics"></ul>
     </div>
 
     <script>
-        let map = null;
-        let directionsService = null;
-        let directionsRenderer = null;
-        let mapVisible = false;
-
-        // パターンデータ
-        const patterns = {
-            weekday: {
-                assignments: [
-                    {
-                        id: 1,
-                        driver: { name: '田中', age: 35, gender: '女性' },
-                        vehicle: { name: 'ノア', capacity: 8 },
-                        children: [
-                            { name: 'Aくん', school: '〇〇小学校', time: '13:10', address: '〇〇町1-2', lat: 35.6762, lng: 139.6503 },
-                            { name: 'Eちゃん', school: '△△小学校', time: '14:25', address: '△△市2-1-105', lat: 35.6756, lng: 139.6598, restrictions: '女性希望' }
-                        ],
-                        estimatedTime: 45
-                    },
-                    {
-                        id: 2,
-                        driver: { name: '眞田', age: 32, gender: '男性' },
-                        vehicle: { name: 'キャラバン', capacity: 10 },
-                        children: [
-                            { name: 'Bくん', school: '△△小学校', time: '14:25', address: '△△市4-8-201', lat: 35.6785, lng: 139.6582 },
-                            { name: 'Cくん', school: '✕✕中学校', time: '14:45', address: '✕✕町7-8', lat: 35.6821, lng: 139.6536 }
-                        ],
-                        estimatedTime: 40
-                    }
-                ],
-                maxRideTime: 39,
-                longestRideChild: 'Eちゃん'
-            },
-            saturday: {
-                assignments: [
-                    {
-                        id: 1,
-                        driver: { name: '井上', age: 23, gender: '女性' },
-                        vehicle: { name: 'スイフト', capacity: 5 },
-                        children: [
-                            { name: 'Bくん', school: '△△小学校', time: '14:25', address: '△△市4-8-201', lat: 35.6785, lng: 139.6582 },
-                            { name: 'Eちゃん', school: '△△小学校', time: '14:25', address: '△△市2-1-105', lat: 35.6756, lng: 139.6598, restrictions: '女性希望' }
-                        ],
-                        estimatedTime: 35
-                    }
-                ],
-                maxRideTime: 27,
-                longestRideChild: 'Eちゃん'
-            }
-        };
-
-        // パターン読み込み
-        function loadPattern(patternType) {
-            const pattern = patterns[patternType];
-            if (!pattern) return;
-
-            // 結果エリアを表示
-            document.getElementById('resultArea').classList.remove('hidden');
-
-            // 統計更新
-            document.getElementById('vehicleCount').textContent = `${pattern.assignments.length}台の車両`;
-            document.getElementById('maxRideTime').textContent = `${pattern.maxRideTime}分 (${pattern.longestRideChild})`;
-
-            // ルート選択更新
-            const select = document.getElementById('routeSelect');
-            select.innerHTML = '<option value="">ルートを選択</option>';
-            pattern.assignments.forEach(assignment => {
-                const option = document.createElement('option');
-                option.value = assignment.id;
-                option.textContent = `${assignment.driver.name}さん - ${assignment.vehicle.name} (${assignment.children.length}人)`;
-                select.appendChild(option);
-            });
-
-            // 送迎プラン表示
-            displayAssignments(pattern.assignments);
-
-            // ルート選択イベント
-            select.onchange = function() {
-                const assignmentId = parseInt(this.value);
-                const assignment = pattern.assignments.find(a => a.id === assignmentId);
-                if (assignment && mapVisible) {
-                    calculateRoute(assignment);
-                }
-            };
-
-            // 結果エリアまでスクロール
-            document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+        const diagnostics = document.getElementById('diagnostics');
+        const status = document.getElementById('status');
+        
+        function addDiagnostic(message, isError = false) {
+            const li = document.createElement('li');
+            li.textContent = message;
+            li.style.color = isError ? '#dc3545' : '#28a745';
+            diagnostics.appendChild(li);
         }
-
-        // 送迎プラン表示
-        function displayAssignments(assignments) {
-            const container = document.getElementById('assignments');
-            container.innerHTML = '';
-
-            assignments.forEach(assignment => {
-                const div = document.createElement('div');
-                div.className = 'assignment-card';
+        
+        function updateStatus(message, type = 'info') {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        // 診断開始
+        addDiagnostic(`🌐 現在のURL: ${window.location.href}`);
+        addDiagnostic(`🕐 テスト開始時刻: ${new Date().toLocaleString()}`);
+        
+        // Google Maps API読み込み
+        window.initMap = function() {
+            try {
+                addDiagnostic('✅ initMap関数が呼ばれました');
                 
-                const childrenHtml = assignment.children.map(child => `
-                    <div class="item child">
-                        <div class="item-content">
-                            <div class="item-title">${child.name}</div>
-                            <div class="item-subtitle">${child.address}</div>
-                            ${child.restrictions ? `<div class="restriction">制限: ${child.restrictions}</div>` : ''}
-                        </div>
-                    </div>
-                `).join('');
-
-                const routeHtml = assignment.children.map((child, index) => `
-                    <div class="item route">
-                        <div class="item-number">${index + 1}</div>
-                        <div class="item-content">
-                            <div class="item-title">${child.school}</div>
-                            <div class="item-subtitle">${child.time} 迎え</div>
-                            <div class="item-detail">${child.address}</div>
-                        </div>
-                    </div>
-                `).join('');
-
-                div.innerHTML = `
-                    <div class="assignment-header">
-                        <div class="assignment-title">${assignment.driver.name}さん - ${assignment.vehicle.name}</div>
-                        <div class="assignment-info">${assignment.vehicle.capacity}人乗り • 推定時間: ${assignment.estimatedTime}分</div>
-                    </div>
-                    <div class="assignment-grid">
-                        <div>
-                            <div class="section-header">
-                                <span>👥</span>
-                                担当児童 (${assignment.children.length}人)
-                            </div>
-                            <div class="item-list">
-                                ${childrenHtml}
-                            </div>
-                        </div>
-                        <div>
-                            <div class="section-header">
-                                <span>📍</span>
-                                送迎ルート
-                            </div>
-                            <div class="item-list">
-                                ${routeHtml}
-                                <div class="item final">
-                                    <div class="item-number">✓</div>
-                                    <div class="item-content">
-                                        <div class="item-title">施設へ帰着</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // 新規作成
-        function createNew() {
-            alert('新規作成機能は開発中です。現在は既存パターンをお使いください。');
-        }
-
-        // Google Maps表示切り替え
-        function toggleMap() {
-            const container = document.getElementById('mapContainer');
-            const button = document.getElementById('mapToggle');
-            
-            if (mapVisible) {
-                container.classList.add('hidden');
-                button.textContent = '🗺️ 地図を表示';
-                button.className = 'btn-map show';
-                mapVisible = false;
-            } else {
-                container.classList.remove('hidden');
-                button.textContent = '🗺️ 地図を閉じる';
-                button.className = 'btn-map hide';
-                mapVisible = true;
-                initMap();
-            }
-        }
-
-        // Google Maps初期化
-        function initMap() {
-            if (!window.google) {
-                loadGoogleMaps();
-                return;
-            }
-
-            if (!map) {
-                map = new google.maps.Map(document.getElementById('map'), {
+                if (!window.google) {
+                    throw new Error('Google オブジェクトが存在しません');
+                }
+                
+                if (!window.google.maps) {
+                    throw new Error('Google Maps オブジェクトが存在しません');
+                }
+                
+                const map = new google.maps.Map(document.getElementById('map'), {
                     center: { lat: 35.6762, lng: 139.6503 },
                     zoom: 13
                 });
-
-                directionsService = new google.maps.DirectionsService();
-                directionsRenderer = new google.maps.DirectionsRenderer({
-                    polylineOptions: {
-                        strokeColor: '#2563eb',
-                        strokeWeight: 4
-                    }
-                });
-                directionsRenderer.setMap(map);
-
-                // 施設マーカー
+                
                 new google.maps.Marker({
                     position: { lat: 35.6762, lng: 139.6503 },
                     map: map,
-                    title: '福祉施設',
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 10,
-                        fillColor: '#16a34a',
-                        fillOpacity: 1,
-                        strokeColor: '#ffffff',
-                        strokeWeight: 2
-                    }
+                    title: 'テスト地点'
                 });
+                
+                addDiagnostic('✅ マップ初期化完了');
+                addDiagnostic('✅ マーカー配置完了');
+                updateStatus('🎉 Google Maps API読み込み成功！', 'success');
+                
+            } catch (error) {
+                addDiagnostic(`❌ マップ初期化エラー: ${error.message}`, true);
+                updateStatus(`❌ マップ初期化失敗: ${error.message}`, 'error');
             }
-        }
-
-        // Google Maps API読み込み
+        };
+        
+        // API読み込み
         function loadGoogleMaps() {
             const script = document.createElement('script');
-            script.src = 'https://maps.googleapis.com/maps/js?key=AIzaSyA-hMVylLLCiSjGvZsGr9mnkAH1RSHh1uI&callback=initMap';
+            const apiKey = 'AIzaSyBdC8aKMeTRWripn2cKj4SI3A69UNSzYkg';
+            script.src = `https://maps.googleapis.com/maps/js?key=${apiKey}&callback=initMap`;
             script.async = true;
             script.defer = true;
+            
+            script.onload = function() {
+                addDiagnostic('✅ Google Maps APIスクリプト読み込み完了');
+            };
+            
             script.onerror = function() {
-                document.getElementById('mapStatus').innerHTML = '<span style="color: #dc2626;">❌ Google Maps APIの読み込みに失敗しました</span>';
+                addDiagnostic('❌ Google Maps APIスクリプト読み込み失敗', true);
+                updateStatus('❌ Google Maps API読み込み失敗', 'error');
+                
+                // 詳細エラー情報を追加
+                addDiagnostic('🔍 考えられる原因:', true);
+                addDiagnostic('  - APIキーが無効または削除された', true);
+                addDiagnostic('  - Maps JavaScript APIが有効になっていない', true);
+                addDiagnostic('  - ウェブサイト制限の設定ミス', true);
+                addDiagnostic('  - 請求アカウントが設定されていない', true);
+                addDiagnostic('  - プロジェクトが停止されている', true);
             };
+            
             document.head.appendChild(script);
+            addDiagnostic('📡 Google Maps APIスクリプト要素を追加');
         }
-
-        // ルート計算
-        function calculateRoute(assignment) {
-            if (!directionsService || !directionsRenderer) return;
-
-            const waypoints = assignment.children.map(child => ({
-                location: { lat: child.lat, lng: child.lng },
-                stopover: true
-            }));
-
-            const request = {
-                origin: { lat: 35.6762, lng: 139.6503 },
-                destination: { lat: 35.6762, lng: 139.6503 },
-                waypoints: waypoints,
-                optimizeWaypoints: true,
-                travelMode: google.maps.TravelMode.DRIVING
-            };
-
-            directionsService.route(request, (result, status) => {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(result);
-                    document.getElementById('mapStatus').innerHTML = `
-                        <span style="color: #166534;">✅ ${assignment.driver.name}さんのルートを表示中</span>
-                    `;
-                } else {
-                    document.getElementById('mapStatus').innerHTML = `
-                        <span style="color: #dc2626;">❌ ルート計算に失敗しました: ${status}</span>
-                    `;
-                }
-            });
-        }
-
-        // 初期化
-        console.log('福祉施設児童送迎システム初期化完了');
+        
+        // ページ読み込み完了後に実行
+        document.addEventListener('DOMContentLoaded', function() {
+            addDiagnostic('✅ DOM読み込み完了');
+            loadGoogleMaps();
+        });
     </script>
 </body>
 </html>
